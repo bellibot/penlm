@@ -6,7 +6,7 @@ from pyomo.core.expr import numeric_expr
 from pyomo.opt import SolverFactory
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import Ridge, LogisticRegression
-from base_estimators import BaseClassifier, BaseRegressor
+from penlm.base_estimators import BaseClassifier, BaseRegressor
 from abc import ABC, abstractmethod
 from typing import Dict, Tuple
 

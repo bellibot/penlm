@@ -2,7 +2,7 @@ import numpy as np
 
 from sklearn.preprocessing import StandardScaler      
 from sklearn.linear_model import Lasso, LogisticRegression
-from base_estimators import BaseClassifier, BaseRegressor
+from penlm.base_estimators import BaseClassifier, BaseRegressor
 from typing import Dict
              
                                                                           

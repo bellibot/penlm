@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler      
 from sklearn.linear_model import Ridge, LogisticRegression
 from sklearn.metrics import accuracy_score, balanced_accuracy_score
-from base_estimators import BaseClassifier, BaseRegressor
+from penlm.base_estimators import BaseClassifier, BaseRegressor
 from typing import Dict
                            
                                                                          
