@@ -1,4 +1,5 @@
 from penlm.grid_search import GridSearchCV
+from base_estimators import BaseClassifier, BaseRegressor
 from penlm.adaptive_lasso import AdaptiveLassoClassifier, AdaptiveLassoRegressor
 from penlm.bar_estimator import BARClassifier, BARRegressor
 from penlm.non_negative_garrote import NNGarroteClassifier, NNGarroteRegressor
