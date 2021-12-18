@@ -1,5 +1,4 @@
-# penlm
-## _Penalized Linear Models_
+## penlm - Penalized Linear Models
 
 `penlm` is a Python package that implements a few penalty based linear models that aren't (currently) available in `scikit-learn`. All the models are implemented with the familiar `fit`/`predict`/`predict_proba`/`score` interface. 
 
