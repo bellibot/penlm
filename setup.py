@@ -9,7 +9,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 setup(
   name = 'penlm',
   packages = ['penlm'],
-  version = 'v1.0.6', 
+  version = 'v1.0.7', 
   license='MIT',
   description = 'Penalized Linear Models for Classification and Regression',
   long_description=long_description,
@@ -17,7 +17,7 @@ setup(
   author = 'Edoardo Belli',
   author_email = 'iedobelli@gmail.com',
   url = 'https://github.com/bellibot/penlm',
-  download_url = 'https://github.com/bellibot/penlm/archive/refs/tags/v1.0.6.tar.gz',
+  download_url = 'https://github.com/bellibot/penlm/archive/refs/tags/v1.0.7.tar.gz',
   keywords = ['Classification', 'Regression', 'Linear', 'Penalty'],
   python_requires='>=3.5',
   install_requires=[
