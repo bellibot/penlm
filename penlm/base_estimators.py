@@ -2,7 +2,7 @@ import numpy as np
 
 from typing import Dict
 from abc import ABC, abstractmethod
-from sklearn.metrics import accuracy_score, balanced_accuracy_score
+from sklearn.metrics import accuracy_score, balanced_accuracy_score, r2_score
                                   
 
 class BaseClassifier(ABC):
@@ -76,12 +76,14 @@ class BaseRegressor(ABC):
     def score(self,
               X: np.ndarray,
               Y: np.ndarray,
-              scoring: str = 'mse') -> np.ndarray:
+              scoring: str = 'r2') -> np.ndarray:
         pred_Y = self.predict(X)
-        if scoring == 'mse':
-            score = np.mean((pred_Y-Y)**2)
-        elif scoring == 'mae':  
-            score = np.mean(np.abs(pred_Y-Y))
+        if scoring == 'neg_mean_squared_error':
+            score = -np.mean((pred_Y-Y)**2)
+        elif scoring == 'neg_mean_absolute_error':  
+            score = -np.mean(np.abs(pred_Y-Y))
+        elif scoring == 'r2':  
+            score = r2_score(Y, pred_Y)
         else:
             raise ValueError(f'Illegal scoring {scoring}')
         return score

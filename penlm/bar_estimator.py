@@ -2,7 +2,7 @@ import numpy as np
 
 from sklearn.preprocessing import StandardScaler      
 from sklearn.linear_model import Ridge, LogisticRegression
-from sklearn.metrics import accuracy_score, balanced_accuracy_score
+from sklearn.metrics import accuracy_score, balanced_accuracy_score, r2_score
 from penlm.base_estimators import BaseClassifier, BaseRegressor
 from typing import Dict
                            
@@ -240,10 +240,12 @@ class BARRegressor(BaseRegressor):
             pred = np.dot(beta,x) + intercept
             pred_Y.append(pred)
         pred_Y = np.array(pred_Y)
-        if self.scoring == 'mse':
+        if self.scoring == 'neg_mean_squared_error':
             score = np.mean((pred_Y-Y)**2)
-        elif self.scoring == 'mae':  
+        elif self.scoring == 'neg_mean_absolute_error':  
             score = np.mean(np.abs(pred_Y-Y))
+        elif self.scoring == 'r2':
+            score = r2_score(Y, pred_Y) 
         else:
             raise ValueError(f'Illegal scoring {self.scoring}')
         return score 
