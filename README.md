@@ -56,14 +56,13 @@ cv = StratifiedKFold(n_splits = 2,
 grid_search = gs.GridSearchCV(estimator,
                               parameters,
                               cv,
-                              scoring = balanced_accuracy_score)
+                              scoring = balanced_accuracy_score,
+                              verbose = False,
+                              n_jobs = -1)
 grid_search.fit(X[train_index],
                 Y[train_index])
 score = grid_search.score(X[test_index],
-                          Y[test_index],
-                          scoring = balanced_accuracy_score,
-                          verbose = False,
-                          n_jobs = -1)
+                          Y[test_index])
 ```
 The test folder in the `github` repo contains two sample scripts that show how to use all the estimators (in both classification and regression tasks). In particular, for the Adaptive Lasso and the NNG you need to provide an initial coefficient vector as a `np.ndarray`, with the same shape as the one found in `scikit-learn` estimators (the test scripts fit a LogisticRegression/Ridge estimator and use the `estimator.coef_` object).
 Moreover, regarding the `scoring`, all the estimators and the grid search class use `accuracy`/`R^2` as default scores (when the argument `scoring = None`), but you can provide any `Callable` scoring function found in `sklearn.metrics`. Beware that higher is better, and therefore when scoring with errors like `sklearn.metrics.mean_squared_error`, you need to wrap that in a custom function that changes its sign.
