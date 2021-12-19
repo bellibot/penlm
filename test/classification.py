@@ -99,8 +99,7 @@ if __name__ == "__main__":
         grid_search.fit(X[train_index],
                         Y[train_index])
         score = grid_search.score(X[test_index],
-                                  Y[test_index],
-                                  scoring = scoring)
+                                  Y[test_index])
         roughness_score_list.append(score)
 
 
@@ -118,8 +117,7 @@ if __name__ == "__main__":
         grid_search.fit(X[train_index],
                         Y[train_index])
         score = grid_search.score(X[test_index],
-                                  Y[test_index],
-                                  scoring = scoring)
+                                  Y[test_index])
         relaxed_lasso_score_list.append(score)
 
 
@@ -137,8 +135,7 @@ if __name__ == "__main__":
         grid_search.fit(X[train_index],
                         Y[train_index])
         score = grid_search.score(X[test_index],
-                                  Y[test_index],
-                                  scoring = scoring)
+                                  Y[test_index])
         adaptive_lasso_score_list.append(score)
         
         
@@ -155,8 +152,7 @@ if __name__ == "__main__":
         grid_search.fit(X[train_index],
                         Y[train_index])
         score = grid_search.score(X[test_index],
-                                  Y[test_index],
-                                  scoring = scoring)
+                                  Y[test_index])
         bar_score_list.append(score)
             
         
@@ -173,8 +169,7 @@ if __name__ == "__main__":
         grid_search.fit(X[train_index],
                         Y[train_index])
         score = grid_search.score(X[test_index],
-                                  Y[test_index],
-                                  scoring = scoring)
+                                  Y[test_index])
         garrote_score_list.append(score)   
                         
         ### SACR ###
@@ -189,8 +184,7 @@ if __name__ == "__main__":
         grid_search.fit(X[train_index],
                         Y[train_index])
         score = grid_search.score(X[test_index],
-                                  Y[test_index],
-                                  scoring = scoring)
+                                  Y[test_index])
         sacr_score_list.append(score)
         
     print(f'RIDGE TEST SCORE:          {np.mean(ridge_score_list)}')
