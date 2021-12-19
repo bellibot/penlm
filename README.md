@@ -1,6 +1,6 @@
 ## penlm - Penalized Linear Models
 
-`penlm` is a Python package that implements a few penalty based linear models that aren't (currently) available in `scikit-learn`. All the models are implemented with the familiar `fit`/`predict`/`predict_proba`/`score` interface. 
+`penlm` is a Python package that implements a few penalty based linear models that aren't (currently) available in `scikit-learn`. All the models are implemented with the familiar `fit`/`predict`/`predict_proba`/`score` interface.
 
 The supported estimators are:
 - Smoothly Adaptively Centered Ridge ([SACR](https://doi.org/10.1016/j.jmva.2021.104882))
@@ -10,13 +10,14 @@ The supported estimators are:
 - Broken Adaptive Ridge ([BAR](https://doi.org/10.1016/j.jmva.2018.08.007)) 
 - Non-negative Garrote ([NNG](https://doi.org/10.2307/1269730))
 
-All the estimators have `fit_intercept` and `scale` (with `sklearn.preprocessing.StandardScaler`) arguments, and work for the following tasks:
+All the estimators have `fit_intercept` and `scale` arguments (scaling is done with `sklearn.preprocessing.StandardScaler`) , and work for the following tasks:
 
 - Linear Regression
 - Binary Classification (Logistic Regression)
 - Multiclass Classification (One-vs-Rest)
 
-A custom cross-validation object is provided in order to perform grid search hyperparameter tuning (with any splitter from `scikit-learn`), and uses `multiprocessing` for parallelization (default `n_jobs = -1`).
+A custom `cross-validation` object is provided in order to perform grid search hyperparameter tuning (with any splitter from `scikit-learn`), and uses `multiprocessing` for parallelization (default `n_jobs = -1`).
+Multiclass fitting is `not` parallelized in this version (that would be beneficial when a high number of cores is available, or when refitting the best estimator in the grid search object).
 
 ## Installation
 
@@ -25,7 +26,7 @@ The package can be installed from terminal with the command `pip install penlm`.
 
 ## Usage
 
-The following snippet shows how to fit an estimator with its own parameters and grid search object:
+The following lines show how to fit an estimator with its own parameters and grid search object, by using a `StratifiedKFold` splitter:
 
 ```sh
 import numpy as np
@@ -33,6 +34,7 @@ import penlm.grid_search as gs
 from penlm.smoothly_adaptively_centered_ridge import SACRClassifier
 from sklearn.model_selection import StratifiedKFold
 from sklearn.datasets import load_wine
+from sklearn.metrics import balanced_accuracy_score
 
 X, Y = load_wine(return_X_y = True)
 
@@ -54,16 +56,17 @@ cv = StratifiedKFold(n_splits = 2,
 grid_search = gs.GridSearchCV(estimator,
                               parameters,
                               cv,
-                              scoring = 'balanced_accuracy')
+                              scoring = balanced_accuracy_score)
 grid_search.fit(X[train_index],
                 Y[train_index])
 score = grid_search.best_estimator.score(X[test_index],
                                          Y[test_index],
-                                         scoring = 'balanced_accuracy',
+                                         scoring = balanced_accuracy_score,
                                          verbose = False,
                                          n_jobs = -1)
 ```
-A test script for all estimators (in both classification and regression) is also provided in the github repo. 
+The test folder in the `github` repo contains two sample scripts that show how to use all the estimators (in both classification and regression tasks). In particular, for the Adaptive Lasso and the NNG you need to provide an initial coefficient vector as a `np.ndarray`, with the same shape as the one found in `scikit-learn` estimators (the test scripts fit a LogisticRegression/Ridge estimator and use the `estimator.coef_` object).
+Moreover, regarding the `scoring`, all the estimators and the grid search class use `accuracy`/`R^2` as default scores (when the argument `scoring = None`), but you can provide any `Callable` scoring function found in `sklearn.metrics`. Beware that higher is better, and therefore when scoring with errors like `sklearn.metrics.mean_squared_error`, you need to wrap that in a custom function that changes its sign.
 
 ## Citing
 
