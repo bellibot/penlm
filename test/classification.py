@@ -78,8 +78,7 @@ if __name__ == "__main__":
         grid_search = GridSearchCV(pipeline,
                                    parameters,
                                    cv = _cv,
-                                   n_jobs = -1,
-                                   scoring = scoring)
+                                   n_jobs = -1)
         grid_search.fit(X[train_index],Y[train_index])
         beta_ridge = grid_search.best_estimator_[1].coef_
         score = grid_search.score(X[test_index],
