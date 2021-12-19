@@ -1,17 +1,17 @@
 import numpy as np
 import penlm.grid_search as gs
-from penlm.smooth_linear_model import SmoothLinearClassifier
-from penlm.smoothly_adaptively_centered_ridge import SACRClassifier
-from penlm.relaxed_lasso import RelaxedLassoClassifier
-from penlm.adaptive_lasso import AdaptiveLassoClassifier
-from penlm.bar_estimator import BARClassifier
-from penlm.non_negative_garrote import NNGarroteClassifier
+from penlm.smooth_linear_model import SmoothLinearRegressor
+from penlm.smoothly_adaptively_centered_ridge import SACRRegressor 
+from penlm.relaxed_lasso import RelaxedLassoRegressor
+from penlm.adaptive_lasso import AdaptiveLassoRegressor
+from penlm.bar_estimator import BARRegressor
+from penlm.non_negative_garrote import NNGarroteRegressor 
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import StratifiedKFold, GridSearchCV
-from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import KFold, GridSearchCV
+from sklearn.linear_model import Ridge
 from sklearn.pipeline import Pipeline
-from sklearn.datasets import make_classification
-from sklearn.metrics import balanced_accuracy_score
+from sklearn.datasets import make_regression
+from sklearn.metrics import explained_variance_score
 
 import warnings, os
 warnings.simplefilter("ignore")
@@ -20,23 +20,22 @@ os.environ["PYTHONWARNINGS"] = "ignore"
             
 if __name__ == "__main__":
     random_state = 46
-    X, Y = make_classification(n_samples = 90,
-                               n_features = 120,
-                               n_redundant = 50,
-                               n_repeated = 0,
-                               n_informative = 50,
-                               n_classes = 3,
-                               random_state = random_state)          
+    X, Y = make_regression(n_samples = 90,
+                           n_features = 120,
+                           n_informative = 80,
+                           noise = 1,
+                           shuffle = True,
+                           random_state = random_state)                                      
     pyomo_solver = 'ipopt'
     fit_intercept = True
     scoring = None
-    #scoring = balanced_accuracy_score
+    #scoring = explained_variance_score
     scale = True
     n_splits = 2
     n_splits_grid_search = 2
-    begin = -3 
-    end = 3 
-    n_lambda = 5     
+    begin = -5 
+    end = 5
+    n_lambda = 5   
     lambda_list = np.logspace(begin,
                               end,
                               num = n_lambda,
@@ -54,24 +53,21 @@ if __name__ == "__main__":
     bar_score_list = []  
            
     ### Train/Test splitter ###
-    cv = StratifiedKFold(n_splits = n_splits,
-                         random_state = random_state,
-                         shuffle = True)
+    cv = KFold(n_splits = n_splits,
+               random_state = random_state,
+               shuffle=True)
                    
     for counter,(train_index,test_index) in enumerate(cv.split(X,Y)):
         ### Train/Validation splitter (for Grid Search) ###
-        _cv = StratifiedKFold(n_splits = n_splits_grid_search, 
-                              random_state = random_state,
-                              shuffle = True)
+        _cv = KFold(n_splits = n_splits_grid_search, 
+                    random_state = random_state,
+                    shuffle = True)
        
         ### Ridge ###    
-        estimator = LogisticRegression(penalty = 'l2',
-                                       multi_class = 'ovr',
-                                       class_weight = 'balanced',
-                                       fit_intercept = fit_intercept,
-                                       solver = 'saga',
-                                       max_iter = 1000)
-        parameters = {'ridge__C':lambda_list}
+        estimator = Ridge(fit_intercept = fit_intercept,
+                          solver = 'saga',
+                          max_iter = 1000)
+        parameters = {'ridge__alpha':lambda_list}
         scaler = StandardScaler()   
         pipeline = Pipeline(steps = [('scaler',scaler),
                                      ('ridge', estimator)])    
@@ -83,15 +79,15 @@ if __name__ == "__main__":
         grid_search.fit(X[train_index],Y[train_index])
         beta_ridge = grid_search.best_estimator_[1].coef_
         score = grid_search.score(X[test_index],
-                                  Y[test_index])
+                                  Y[test_index])                                 
         ridge_score_list.append(score)
-        
+                                       
                 
         ### ROUGHNESS ###
-        estimator = SmoothLinearClassifier(pyomo_solver,
-                                           fit_intercept = fit_intercept,
-                                           scale = scale,
-                                           penalty_type = 'd2')
+        estimator = SmoothLinearRegressor(pyomo_solver,
+                                          fit_intercept = fit_intercept,
+                                          scale = scale,
+                                          penalty_type = 'd2')
         parameters = {'lambda':lambda_list}       
         grid_search = gs.GridSearchCV(estimator,
                                       parameters,
@@ -106,9 +102,9 @@ if __name__ == "__main__":
 
 
         ### Relaxed Lasso ###
-        estimator = RelaxedLassoClassifier(fit_intercept = fit_intercept,
-                                           random_state = random_state,
-                                           scale = scale)
+        estimator = RelaxedLassoRegressor(fit_intercept = fit_intercept,
+                                          random_state = random_state,
+                                          scale = scale)
         parameters = {'lambda':lambda_list, 
                       'phi':phi_list_relaxo}
          
@@ -125,9 +121,9 @@ if __name__ == "__main__":
 
 
         ### Adaptive Lasso ###
-        estimator = AdaptiveLassoClassifier(fit_intercept = fit_intercept,
-                                            random_state = random_state,
-                                            scale = scale)
+        estimator = AdaptiveLassoRegressor(fit_intercept = fit_intercept,
+                                           random_state = random_state,
+                                           scale = scale)
         parameters = {'beta_init':[('ridge',beta_ridge)],
                       'lambda':lambda_list, 
                       'gamma':gamma_list_adaptive_lasso}       
@@ -144,10 +140,10 @@ if __name__ == "__main__":
         
         
         ### BAR estimator ###
-        estimator = BARClassifier(fit_intercept = fit_intercept,
-                                  random_state = random_state,
-                                  scale = scale,
-                                  scoring = scoring)
+        estimator = BARRegressor(fit_intercept = fit_intercept,
+                                 random_state = random_state,
+                                 scale = scale,
+                                 scoring = scoring)
         parameters = {'lambda':lambda_list}       
         grid_search = gs.GridSearchCV(estimator,
                                       parameters,
@@ -162,9 +158,9 @@ if __name__ == "__main__":
             
         
         ### NN garrote ###
-        estimator = NNGarroteClassifier(pyomo_solver,
-                                        fit_intercept = fit_intercept,
-                                        scale = scale)
+        estimator = NNGarroteRegressor(pyomo_solver,
+                                       fit_intercept = fit_intercept,
+                                       scale = scale)                     
         parameters = {'beta_init':[('ridge',beta_ridge)], 
                       'lambda':lambda_list}       
         grid_search = gs.GridSearchCV(estimator,
@@ -179,9 +175,9 @@ if __name__ == "__main__":
         garrote_score_list.append(score)   
                         
         ### SACR ###
-        estimator = SACRClassifier(solver = pyomo_solver,
-                                   fit_intercept = fit_intercept,
-                                   scale = scale)
+        estimator = SACRRegressor(solver = pyomo_solver,
+                                  fit_intercept = fit_intercept,
+                                  scale = scale)
         parameters = {'phi':phi_list_sacr,'lambda':lambda_list}
         grid_search = gs.GridSearchCV(estimator,
                                       parameters,
