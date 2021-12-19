@@ -94,9 +94,9 @@ if __name__ == "__main__":
                                       scoring = scoring)
         grid_search.fit(X[train_index],
                         Y[train_index])
-        score = grid_search.best_estimator.score(X[test_index],
-                                                 Y[test_index],
-                                                 scoring = scoring)
+        score = grid_search.score(X[test_index],
+                                  Y[test_index],
+                                  scoring = scoring)
         roughness_score_list.append(score)
 
 
@@ -113,9 +113,9 @@ if __name__ == "__main__":
                                       scoring = scoring)
         grid_search.fit(X[train_index],
                         Y[train_index])
-        score = grid_search.best_estimator.score(X[test_index],
-                                                 Y[test_index],
-                                                 scoring = scoring)
+        score = grid_search.score(X[test_index],
+                                  Y[test_index],
+                                  scoring = scoring)
         relaxed_lasso_score_list.append(score)
 
 
@@ -132,9 +132,9 @@ if __name__ == "__main__":
                                       scoring = scoring)
         grid_search.fit(X[train_index],
                         Y[train_index])
-        score = grid_search.best_estimator.score(X[test_index],
-                                                 Y[test_index],
-                                                 scoring = scoring)
+        score = grid_search.score(X[test_index],
+                                  Y[test_index],
+                                  scoring = scoring)
         adaptive_lasso_score_list.append(score)
         
         
@@ -150,9 +150,9 @@ if __name__ == "__main__":
                                       scoring = scoring)
         grid_search.fit(X[train_index],
                         Y[train_index])
-        score = grid_search.best_estimator.score(X[test_index],
-                                                 Y[test_index],
-                                                 scoring = scoring)
+        score = grid_search.score(X[test_index],
+                                  Y[test_index],
+                                  scoring = scoring)
         bar_score_list.append(score)
             
         
@@ -168,9 +168,9 @@ if __name__ == "__main__":
                                       scoring = scoring)
         grid_search.fit(X[train_index],
                         Y[train_index])
-        score = grid_search.best_estimator.score(X[test_index],
-                                                 Y[test_index],
-                                                 scoring = scoring)
+        score = grid_search.score(X[test_index],
+                                  Y[test_index],
+                                  scoring = scoring)
         garrote_score_list.append(score)   
                         
         ### SACR ###
@@ -184,9 +184,9 @@ if __name__ == "__main__":
                                       scoring = scoring)
         grid_search.fit(X[train_index],
                         Y[train_index])
-        score = grid_search.best_estimator.score(X[test_index],
-                                                 Y[test_index],
-                                                 scoring = scoring)
+        score = grid_search.score(X[test_index],
+                                  Y[test_index],
+                                  scoring = scoring)
         sacr_score_list.append(score)
         
     print(f'RIDGE TEST SCORE:          {np.mean(ridge_score_list)}')
