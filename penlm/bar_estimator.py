@@ -2,9 +2,9 @@ import numpy as np
 
 from sklearn.preprocessing import StandardScaler      
 from sklearn.linear_model import Ridge, LogisticRegression
-from sklearn.metrics import accuracy_score, balanced_accuracy_score, r2_score
+from sklearn.metrics import accuracy_score, r2_score
 from penlm.base_estimators import BaseClassifier, BaseRegressor
-from typing import Dict
+from typing import Dict, Callable
                            
                                                                          
 class BARClassifier(BaseClassifier):
@@ -16,7 +16,7 @@ class BARClassifier(BaseClassifier):
                  random_state: int = None,
                  solver: str = 'saga',
                  scikit_max_iter: int = 1000,
-                 scoring: str = 'balanced_accuracy'):
+                 scoring: Callable = None):
         self.class_weight = class_weight
         self.solver = solver 
         self.fit_intercept = fit_intercept
@@ -31,7 +31,12 @@ class BARClassifier(BaseClassifier):
         self.max_iter = max_iter
         self.n_iters = 0
         self.scikit_max_iter = scikit_max_iter
-        self.scoring = scoring
+        if scoring == None:
+            self.scoring = accuracy_score 
+        elif callable(scoring):
+            self.scoring = scoring 
+        else:
+            raise ValueError(f'Illegal scoring {self.scoring}')
         self.classes = None
 
     
@@ -147,14 +152,9 @@ class BARClassifier(BaseClassifier):
             if np.dot(beta,x) + intercept > 0:
                 pred_Y.append(1)
             else:
-                pred_Y.append(0)
-        if self.scoring == 'balanced_accuracy':
-            score = balanced_accuracy_score(Y,pred_Y) 
-        elif self.scoring == 'accuracy':
-            score = accuracy_score(Y,pred_Y) 
-        else:
-            raise ValueError(f'Illegal scoring {self.scoring}')
-        return score 
+                pred_Y.append(0)   
+        score = self.scoring(Y, pred_Y)
+        return score
         
 
 
@@ -165,7 +165,7 @@ class BARRegressor(BaseRegressor):
                  scale: bool = True,
                  random_state: int = None,
                  scikit_max_iter: int = 1000,
-                 scoring: str = 'mse'):
+                 scoring: Callable = None):
         self.fit_intercept = fit_intercept
         self.parameters = {}
         self.lambd = None
@@ -178,7 +178,12 @@ class BARRegressor(BaseRegressor):
         self.max_iter = max_iter
         self.n_iters = 0
         self.scikit_max_iter = scikit_max_iter
-        self.scoring = scoring
+        if scoring == None:
+            self.scoring = r2_score
+        elif callable(scoring):
+            self.scoring = scoring 
+        else:
+            raise ValueError(f'Illegal scoring {self.scoring}')
 
     
     def set_parameters(self,parameters):
@@ -240,14 +245,7 @@ class BARRegressor(BaseRegressor):
             pred = np.dot(beta,x) + intercept
             pred_Y.append(pred)
         pred_Y = np.array(pred_Y)
-        if self.scoring == 'neg_mean_squared_error':
-            score = np.mean((pred_Y-Y)**2)
-        elif self.scoring == 'neg_mean_absolute_error':  
-            score = np.mean(np.abs(pred_Y-Y))
-        elif self.scoring == 'r2':
-            score = r2_score(Y, pred_Y) 
-        else:
-            raise ValueError(f'Illegal scoring {self.scoring}')
+        score = self.scoring(Y, pred_Y)
         return score 
         
                 

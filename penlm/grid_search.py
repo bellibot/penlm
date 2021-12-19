@@ -1,7 +1,8 @@
 import numpy as np
 import itertools, copy, joblib
 
-from typing import Dict
+from sklearn.metrics import accuracy_score, r2_score
+from typing import Dict, Callable
                
                            
 class GridSearchCV:
@@ -9,7 +10,7 @@ class GridSearchCV:
                  estimator: 'BaseEstimator',
                  parameters: Dict,
                  cv: 'ScikitCVObj',
-                 scoring: str = None,
+                 scoring: Callable = None,
                  verbose: bool = False,
                  n_jobs: int = -1):
         self.parameters_packed = parameters
@@ -19,11 +20,13 @@ class GridSearchCV:
         self.cv = cv
         if scoring == None:
             if estimator.estimator_type=='classifier':
-                self.scoring = 'balanced_accuracy'
+                self.scoring = accuracy_score 
             elif estimator.estimator_type=='regressor':
-                self.scoring = 'r2'
-        else:
+                self.scoring = r2_score                     
+        elif callable(scoring):
             self.scoring = scoring
+        else:
+            raise ValueError(f'Illegal scoring {self.scoring}')
         self.verbose = verbose
         self.n_jobs = n_jobs
         self.fold_estimators = []
@@ -83,4 +86,11 @@ class GridSearchCV:
         self.best_estimator = estimator
         self.best_estimator_train_score = estimator.score(X,Y,self.scoring)
         
-        
+
+    def score(self,
+              X: np.ndarray,
+              Y: np.ndarray) -> np.ndarray:
+        return self.best_estimator.score(X, Y)
+              
+              
+                 

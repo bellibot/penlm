@@ -1,8 +1,8 @@
 import numpy as np
 
-from typing import Dict
+from typing import Dict, Callable
 from abc import ABC, abstractmethod
-from sklearn.metrics import accuracy_score, balanced_accuracy_score, r2_score
+from sklearn.metrics import accuracy_score, r2_score
                                   
 
 class BaseClassifier(ABC):
@@ -33,14 +33,14 @@ class BaseClassifier(ABC):
     def score(self,
               X: np.ndarray,
               Y: np.ndarray,
-              scoring: str = 'balanced_accuracy') -> np.ndarray:
+              scoring: Callable = None) -> np.ndarray:
         pred_Y = self.predict(X) 
-        if scoring == 'balanced_accuracy':
-            score = balanced_accuracy_score(Y,pred_Y) 
-        elif scoring == 'accuracy':
-            score = accuracy_score(Y,pred_Y) 
+        if scoring == None:
+            score = accuracy_score(Y, pred_Y) 
+        elif callable(scoring):
+            score = scoring(Y, pred_Y)
         else:
-            raise ValueError(f'Illegal scoring {scoring}')              
+            raise ValueError(f'Illegal scoring {scoring}')          
         return score
         
         
@@ -76,16 +76,14 @@ class BaseRegressor(ABC):
     def score(self,
               X: np.ndarray,
               Y: np.ndarray,
-              scoring: str = 'r2') -> np.ndarray:
-        pred_Y = self.predict(X)
-        if scoring == 'neg_mean_squared_error':
-            score = -np.mean((pred_Y-Y)**2)
-        elif scoring == 'neg_mean_absolute_error':  
-            score = -np.mean(np.abs(pred_Y-Y))
-        elif scoring == 'r2':  
-            score = r2_score(Y, pred_Y)
+              scoring: Callable = None) -> np.ndarray:
+        pred_Y = self.predict(X) 
+        if scoring == None:
+            score = r2_score(Y, pred_Y) 
+        elif callable(scoring):
+            score = scoring(Y, pred_Y)
         else:
-            raise ValueError(f'Illegal scoring {scoring}')
+            raise ValueError(f'Illegal scoring {scoring}')          
         return score
         
         
