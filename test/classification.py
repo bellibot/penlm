@@ -12,13 +12,13 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.datasets import make_classification
 from sklearn.metrics import balanced_accuracy_score
-
-import warnings, os
-warnings.simplefilter("ignore")
-os.environ["PYTHONWARNINGS"] = "ignore"
             
             
 if __name__ == "__main__":
+    import warnings, os
+    warnings.simplefilter("ignore")
+    os.environ["PYTHONWARNINGS"] = "ignore"
+    
     random_state = 46
     X, Y = make_classification(n_samples = 90,
                                n_features = 120,

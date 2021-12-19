@@ -13,12 +13,12 @@ from sklearn.pipeline import Pipeline
 from sklearn.datasets import make_regression
 from sklearn.metrics import explained_variance_score
 
-import warnings, os
-warnings.simplefilter("ignore")
-os.environ["PYTHONWARNINGS"] = "ignore"
-            
             
 if __name__ == "__main__":
+    import warnings, os
+    warnings.simplefilter("ignore")
+    os.environ["PYTHONWARNINGS"] = "ignore"
+
     random_state = 46
     X, Y = make_regression(n_samples = 90,
                            n_features = 120,
