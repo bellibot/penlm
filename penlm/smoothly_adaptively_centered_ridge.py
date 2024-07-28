@@ -8,13 +8,12 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import Ridge, LogisticRegression
 from penlm.base_estimators import BaseClassifier, BaseRegressor
 from abc import ABC, abstractmethod
-from typing import Dict, Tuple
 
 
 
 class BaseSACR(ABC):
     def set_parameters(self,
-                       parameters: Dict):
+                       parameters: dict):
         self.parameters['lambda'] = parameters['lambda']
         self.parameters['phi'] = parameters['phi']
         self.lambd = parameters['lambda']
@@ -29,13 +28,13 @@ class BaseSACR(ABC):
     def _init_ridge(self,
                     X: np.ndarray,
                     Y: np.ndarray):
-        pass
+        raise NotImplementedError()
             
                             
     def _joint_ridge(self,
                      X: np.ndarray,
                      Y: np.ndarray,
-                     g: np.ndarray) -> Tuple[int,np.ndarray,np.ndarray]:
+                     g: np.ndarray) -> tuple[int,np.ndarray,np.ndarray]:
         N = X.shape[0]
         P = X.shape[1]
         model = pyo.ConcreteModel()
@@ -80,7 +79,7 @@ class BaseSACR(ABC):
                   X: np.ndarray,
                   Y: np.ndarray,
                   g: np.ndarray) -> numeric_expr:
-        pass
+        raise NotImplementedError()
 
 
     def _get_first_penalty_expr(self,

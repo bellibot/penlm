@@ -4,7 +4,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import Ridge, LogisticRegression
 from sklearn.metrics import accuracy_score, r2_score
 from penlm.base_estimators import BaseClassifier, BaseRegressor
-from typing import Dict, Callable
                            
                                                                          
 class BARClassifier(BaseClassifier):
@@ -16,7 +15,7 @@ class BARClassifier(BaseClassifier):
                  random_state: int = None,
                  solver: str = 'saga',
                  scikit_max_iter: int = 1000,
-                 scoring: Callable = None):
+                 scoring: callable = None):
         self.class_weight = class_weight
         self.solver = solver 
         self.fit_intercept = fit_intercept
@@ -165,7 +164,7 @@ class BARRegressor(BaseRegressor):
                  scale: bool = True,
                  random_state: int = None,
                  scikit_max_iter: int = 1000,
-                 scoring: Callable = None):
+                 scoring: callable = None):
         self.fit_intercept = fit_intercept
         self.parameters = {}
         self.lambd = None

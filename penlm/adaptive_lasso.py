@@ -4,7 +4,6 @@ import copy
 from sklearn.preprocessing import StandardScaler      
 from sklearn.linear_model import Lasso, LogisticRegression
 from penlm.base_estimators import BaseClassifier, BaseRegressor
-from typing import Dict
               
                                                                           
 class AdaptiveLassoClassifier(BaseClassifier):
@@ -32,7 +31,7 @@ class AdaptiveLassoClassifier(BaseClassifier):
 
     
     def set_parameters(self,
-                       parameters: Dict):
+                       parameters: dict):
         self.gamma = parameters['gamma']
         self.lambd = parameters['lambda']
         self.beta_init = parameters['beta_init'][1]
@@ -115,7 +114,7 @@ class AdaptiveLassoRegressor(BaseRegressor):
 
     
     def set_parameters(self,
-                       parameters: Dict):
+                       parameters: dict):
         self.gamma = parameters['gamma']
         self.lambd = parameters['lambda']
         self.beta_init = parameters['beta_init'][1]

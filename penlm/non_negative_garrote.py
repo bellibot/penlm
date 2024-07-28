@@ -6,12 +6,11 @@ from pyomo.opt import SolverFactory
 from sklearn.preprocessing import StandardScaler
 from penlm.base_estimators import BaseClassifier, BaseRegressor
 from abc import ABC, abstractmethod
-from typing import Dict, Tuple
                           
 
 class BaseNNGarrote(ABC):
     def set_parameters(self,
-                       parameters: Dict):
+                       parameters: dict):
         self.lambd = parameters['lambda']
         self.beta_init = parameters['beta_init'][1]
         self.parameters['lambda'] = self.lambd
@@ -23,7 +22,7 @@ class BaseNNGarrote(ABC):
     def _solve_optim(self,
                      X: np.ndarray,
                      Y: np.ndarray,
-                     beta_init: np.ndarray) -> Tuple[int,np.ndarray,np.ndarray]:
+                     beta_init: np.ndarray) -> tuple[int,np.ndarray,np.ndarray]:
         P = X.shape[1]
         N = X.shape[0]
         for i in range(N):
@@ -59,7 +58,7 @@ class BaseNNGarrote(ABC):
                   model: pyo.ConcreteModel,
                   X: np.ndarray,
                   Y: np.ndarray) -> numeric_expr:
-        pass
+        raise NotImplementedError()
         
         
                                                                                   
