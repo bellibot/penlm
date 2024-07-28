@@ -6,7 +6,6 @@ from pyomo.opt import SolverFactory
 from sklearn.preprocessing import StandardScaler
 from penlm.base_estimators import BaseClassifier, BaseRegressor
 from abc import ABC, abstractmethod
-from typing import Dict, Tuple
 
 
 class BaseSmoothLinear(ABC):
@@ -14,7 +13,7 @@ class BaseSmoothLinear(ABC):
 
     
     def set_parameters(self,
-                       parameters: Dict):
+                       parameters: dict):
         self.lambd = parameters['lambda']
         self.parameters['lambda'] = self.lambd
         if self.lambd <= 0:
@@ -23,7 +22,7 @@ class BaseSmoothLinear(ABC):
 
     def _solve_optim(self,
                      X: np.ndarray,
-                     Y: np.ndarray) -> Tuple[int, np.ndarray]:
+                     Y: np.ndarray) -> tuple[int, np.ndarray]:
         P = X.shape[1]
         N = X.shape[0]
         model = pyo.ConcreteModel()
@@ -44,7 +43,7 @@ class BaseSmoothLinear(ABC):
         
         beta = []
         for p in range(P):
-            beta.append(pyo.value(model.beta[p]))   
+            beta.append(pyo.value(model.beta[p]))
         beta = np.array(beta)
         if self.fit_intercept:
             intercept = pyo.value(model.intercept)
@@ -58,7 +57,7 @@ class BaseSmoothLinear(ABC):
                   model: pyo.ConcreteModel,
                   X: np.ndarray,
                   Y: np.ndarray) -> numeric_expr:
-        pass
+        raise NotImplementedError()
        
         
     def _get_penalty_expr(self,

@@ -1,6 +1,5 @@
 import numpy as np
 
-from typing import Dict, Callable
 from abc import ABC, abstractmethod
 from sklearn.metrics import accuracy_score, r2_score
                                   
@@ -33,7 +32,7 @@ class BaseClassifier(ABC):
     def score(self,
               X: np.ndarray,
               Y: np.ndarray,
-              scoring: Callable = None) -> np.ndarray:
+              scoring: callable = None) -> np.ndarray:
         pred_Y = self.predict(X) 
         if scoring == None:
             score = accuracy_score(Y, pred_Y) 
@@ -46,15 +45,15 @@ class BaseClassifier(ABC):
         
     @abstractmethod
     def set_parameters(self,
-                       parameters: Dict):
-        pass
+                       parameters: dict):
+        raise NotImplementedError()
           
                 
     @abstractmethod            
     def fit(self,
             X: np.ndarray,
             Y: np.ndarray) -> 'BaseClassifier':          
-        pass    
+        raise NotImplementedError()    
         
         
         
@@ -76,7 +75,7 @@ class BaseRegressor(ABC):
     def score(self,
               X: np.ndarray,
               Y: np.ndarray,
-              scoring: Callable = None) -> np.ndarray:
+              scoring: callable = None) -> np.ndarray:
         pred_Y = self.predict(X) 
         if scoring == None:
             score = r2_score(Y, pred_Y) 
@@ -89,15 +88,15 @@ class BaseRegressor(ABC):
         
     @abstractmethod
     def set_parameters(self,
-                       parameters: Dict):
-        pass
+                       parameters: dict):
+        raise NotImplementedError()
           
                 
     @abstractmethod            
     def fit(self,
             X: np.ndarray,
             Y: np.ndarray) -> 'BaseRegressor':          
-        pass    
+        raise NotImplementedError()    
 
 
 

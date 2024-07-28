@@ -1,3 +1,5 @@
+import warnings
+import os
 import numpy as np
 import penlm.grid_search as gs
 from penlm.smooth_linear_model import SmoothLinearClassifier
@@ -15,7 +17,6 @@ from sklearn.metrics import balanced_accuracy_score
             
             
 if __name__ == "__main__":
-    import warnings, os
     warnings.simplefilter("ignore")
     os.environ["PYTHONWARNINGS"] = "ignore"
     
@@ -45,7 +46,7 @@ if __name__ == "__main__":
     gamma_list_adaptive_lasso = [0.001,0.01,0.1,1]
     phi_list_relaxo = phi_list_sacr
 
-    ridge_score_list = []
+    ridge_scikit_score_list = []
     roughness_score_list = []
     sacr_score_list = []
     garrote_score_list = []
@@ -64,7 +65,7 @@ if __name__ == "__main__":
                               random_state = random_state,
                               shuffle = True)
        
-        ### Ridge ###    
+        ### Ridge SCIKIT ###    
         estimator = LogisticRegression(penalty = 'l2',
                                        multi_class = 'ovr',
                                        class_weight = 'balanced',
@@ -80,10 +81,10 @@ if __name__ == "__main__":
                                    cv = _cv,
                                    n_jobs = -1)
         grid_search.fit(X[train_index],Y[train_index])
-        beta_ridge = grid_search.best_estimator_[1].coef_
+        beta_ridge_scikit = grid_search.best_estimator_[1].coef_
         score = grid_search.score(X[test_index],
                                   Y[test_index])
-        ridge_score_list.append(score)
+        ridge_scikit_score_list.append(score)
         
                 
         ### ROUGHNESS ###
@@ -125,7 +126,7 @@ if __name__ == "__main__":
         estimator = AdaptiveLassoClassifier(fit_intercept = fit_intercept,
                                             random_state = random_state,
                                             scale = scale)
-        parameters = {'beta_init':[('ridge',beta_ridge)],
+        parameters = {'beta_init':[('ridge',beta_ridge_scikit)],
                       'lambda':lambda_list, 
                       'gamma':gamma_list_adaptive_lasso}       
         grid_search = gs.GridSearchCV(estimator,
@@ -160,7 +161,7 @@ if __name__ == "__main__":
         estimator = NNGarroteClassifier(pyomo_solver,
                                         fit_intercept = fit_intercept,
                                         scale = scale)
-        parameters = {'beta_init':[('ridge',beta_ridge)], 
+        parameters = {'beta_init':[('ridge',beta_ridge_scikit)], 
                       'lambda':lambda_list}       
         grid_search = gs.GridSearchCV(estimator,
                                       parameters,
@@ -187,12 +188,12 @@ if __name__ == "__main__":
                                   Y[test_index])
         sacr_score_list.append(score)
         
-    print(f'RIDGE TEST SCORE:          {np.mean(ridge_score_list)}')
+    print(f'RIDGE SCIKIT TEST SCORE:   {np.mean(ridge_scikit_score_list)}')
     print(f'ROUGHNESS TEST SCORE:      {np.mean(roughness_score_list)}')
     print(f'BAR TEST SCORE:            {np.mean(bar_score_list)}')
     print(f'RELAXED LASSO TEST SCORE:  {np.mean(relaxed_lasso_score_list)}')
     print(f'ADAPTIVE LASSO TEST SCORE: {np.mean(adaptive_lasso_score_list)}')
     print(f'GARROTE TEST SCORE:        {np.mean(garrote_score_list)}')
     print(f'SACR TEST SCORE:           {np.mean(sacr_score_list)}')
-        
+
 

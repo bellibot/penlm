@@ -1,5 +1,9 @@
+import warnings
+import os
 import numpy as np
 import penlm.grid_search as gs
+from penlm.ridge_estimator import RidgeRegressor
+from penlm.anisotropic_ridge_estimator import AnisotropicRidgeRegressor
 from penlm.smooth_linear_model import SmoothLinearRegressor
 from penlm.smoothly_adaptively_centered_ridge import SACRRegressor 
 from penlm.relaxed_lasso import RelaxedLassoRegressor
@@ -15,7 +19,6 @@ from sklearn.metrics import explained_variance_score
 
             
 if __name__ == "__main__":
-    import warnings, os
     warnings.simplefilter("ignore")
     os.environ["PYTHONWARNINGS"] = "ignore"
 
@@ -44,13 +47,15 @@ if __name__ == "__main__":
     gamma_list_adaptive_lasso = [0.001,0.01,0.1,1]
     phi_list_relaxo = phi_list_sacr
 
+    ridge_scikit_score_list = []
     ridge_score_list = []
+    aniso_ridge_score_list = []
     roughness_score_list = []
     sacr_score_list = []
     garrote_score_list = []
     relaxed_lasso_score_list = [] 
     adaptive_lasso_score_list = [] 
-    bar_score_list = []  
+    bar_score_list = []
            
     ### Train/Test splitter ###
     cv = KFold(n_splits = n_splits,
@@ -63,7 +68,7 @@ if __name__ == "__main__":
                     random_state = random_state,
                     shuffle = True)
        
-        ### Ridge ###    
+        ### Ridge Scikit ###    
         estimator = Ridge(fit_intercept = fit_intercept,
                           solver = 'saga',
                           max_iter = 1000)
@@ -76,13 +81,43 @@ if __name__ == "__main__":
                                    cv = _cv,
                                    n_jobs = -1)
         grid_search.fit(X[train_index],Y[train_index])
-        beta_ridge = grid_search.best_estimator_[1].coef_
+        beta_ridge_scikit = grid_search.best_estimator_[1].coef_
         score = grid_search.score(X[test_index],
                                   Y[test_index])                                 
+        ridge_scikit_score_list.append(score)
+                     
+
+        ### Ridge ###
+        estimator = RidgeRegressor(fit_intercept = fit_intercept,
+                                   scale = scale)
+        parameters = {'lambda':lambda_list}     
+        grid_search = gs.GridSearchCV(estimator,
+                                      parameters,
+                                      _cv,
+                                      scoring = scoring)
+        grid_search.fit(X[train_index],
+                        Y[train_index])
+        score = grid_search.score(X[test_index],
+                                  Y[test_index])
         ridge_score_list.append(score)
-                                       
-                
-        ### ROUGHNESS ###
+
+
+        ### Anisotropic Ridge ###
+        estimator = AnisotropicRidgeRegressor(fit_intercept = fit_intercept,
+                                              scale = scale)
+        parameters = {'lambda':(-lambda_list).tolist()}
+        grid_search = gs.GridSearchCV(estimator,
+                                      parameters,
+                                      _cv,
+                                      scoring = scoring)
+        grid_search.fit(X[train_index],
+                        Y[train_index])
+        score = grid_search.score(X[test_index],
+                                  Y[test_index])
+        aniso_ridge_score_list.append(score)
+
+
+        ### Roughness ###
         estimator = SmoothLinearRegressor(pyomo_solver,
                                           fit_intercept = fit_intercept,
                                           scale = scale,
@@ -121,7 +156,7 @@ if __name__ == "__main__":
         estimator = AdaptiveLassoRegressor(fit_intercept = fit_intercept,
                                            random_state = random_state,
                                            scale = scale)
-        parameters = {'beta_init':[('ridge',beta_ridge)],
+        parameters = {'beta_init':[('ridge',beta_ridge_scikit)],
                       'lambda':lambda_list, 
                       'gamma':gamma_list_adaptive_lasso}       
         grid_search = gs.GridSearchCV(estimator,
@@ -156,7 +191,7 @@ if __name__ == "__main__":
         estimator = NNGarroteRegressor(pyomo_solver,
                                        fit_intercept = fit_intercept,
                                        scale = scale)                     
-        parameters = {'beta_init':[('ridge',beta_ridge)], 
+        parameters = {'beta_init':[('ridge',beta_ridge_scikit)], 
                       'lambda':lambda_list}       
         grid_search = gs.GridSearchCV(estimator,
                                       parameters,
@@ -183,7 +218,9 @@ if __name__ == "__main__":
                                   Y[test_index])
         sacr_score_list.append(score)
         
+    print(f'RIDGE SCIKIT TEST SCORE:   {np.mean(ridge_scikit_score_list)}')
     print(f'RIDGE TEST SCORE:          {np.mean(ridge_score_list)}')
+    print(f'ANISO RIDGE TEST SCORE:    {np.mean(aniso_ridge_score_list)}')
     print(f'ROUGHNESS TEST SCORE:      {np.mean(roughness_score_list)}')
     print(f'BAR TEST SCORE:            {np.mean(bar_score_list)}')
     print(f'RELAXED LASSO TEST SCORE:  {np.mean(relaxed_lasso_score_list)}')

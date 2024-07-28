@@ -3,7 +3,6 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler      
 from sklearn.linear_model import Lasso, LogisticRegression
 from penlm.base_estimators import BaseClassifier, BaseRegressor
-from typing import Dict
              
                                                                           
 class RelaxedLassoClassifier(BaseClassifier):
@@ -30,7 +29,7 @@ class RelaxedLassoClassifier(BaseClassifier):
 
     
     def set_parameters(self,
-                       parameters: Dict):
+                       parameters: dict):
         self.phi = parameters['phi']
         self.lambd = parameters['lambda']
         self.parameters['phi'] = self.phi
@@ -126,7 +125,7 @@ class RelaxedLassoRegressor(BaseRegressor):
 
     
     def set_parameters(self,
-                       parameters: Dict):
+                       parameters: dict):
         self.phi = parameters['phi']
         self.lambd = parameters['lambda']
         self.parameters['phi'] = self.phi
